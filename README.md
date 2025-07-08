@@ -58,6 +58,19 @@ example: "{
         mod i = i + 1;
     }
 }"
+### Use the continue/break keywords to control the loop flow.
+example: "{
+    var int32 i = 0;
+    while i < 10 do {
+        if i == 5 do {
+            continue; // Skip the rest of the loop body when i is 5
+        }
+        if i == 8 do {
+            break; // Exit the loop when i is 8
+        }
+        mod i = i + 1;
+    }
+}"
 
 ## Comments:
 ### Use the // syntax for single-line comments.
