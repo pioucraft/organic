@@ -84,7 +84,7 @@ type ReturnType = {
 }
 
 
-type ExpressionType = (
+type SingleExpressionType = (
     {
         type:
         "variableDeclaration" |
@@ -110,9 +110,33 @@ type ExpressionType = (
         ReturnType
 
     }
-)[]
+)
+
+type ExpressionType = SingleExpressionType[];
 
 var wordsPossibleChars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_";
+
+function findStatementInsideDelimiters(str: TokenType[], startDelimiter: string, endDelimiter: string): TokenType[] {
+    let numberOfOpeningDelimiters = 1;
+    let numberOfClosingDelimiters = 0;
+    let result = [str[0] ?? { type: "unknown", value: "" }];
+    let length = 1
+    while (numberOfOpeningDelimiters != numberOfClosingDelimiters) {
+        if(str[length] == undefined) return result;
+        // @ts-ignore
+        if (str[length].value === startDelimiter) {
+            numberOfOpeningDelimiters++;
+        }
+        // @ts-ignore
+        else if (str[length].value === endDelimiter) {
+            numberOfClosingDelimiters++;
+        }
+        // @ts-ignore
+        result.push(str[length]);
+        length++;
+    }
+    return result;
+}
 
 Bun.file(fileName).text().then((content) => {
     handleFile(content);
@@ -153,7 +177,6 @@ function handleFile(fileContent: string) {
 
     var i = 0
     while (i < outputLines.length) {
-        console.log(i)
         const char = outputLines[i];
 
         if (!char) {
@@ -247,14 +270,18 @@ function handleFile(fileContent: string) {
 
             //@ts-ignore
             if (!wordsPossibleChars.includes(outputLines[i + 1])) {
-                console.log("Current token:", currentToken);
-                console.log("Next token:", outputLines[i + 1]);
                 tokens.push({ type: "word", value: currentToken });
                 currentToken = "";
             }
         }
 
         i++
+    }
+
+    i = 0;
+    while (i < tokens.length) {
+        let token = tokens[i];
+
     }
 
     // output the file to main.out
