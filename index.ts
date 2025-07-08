@@ -2,13 +2,25 @@ var fileName = "main.org"
 
 fileName = process.argv[2] || fileName;
 
+const ReservedKeywords = [
+    "var",
+    "mod",
+    "realloc",
+    "if",
+    "else",
+    "while",
+    "call",
+    "syscall",
+    "function",
+    "return",
+]
+
 type TokenType = {
     type: string;
     value: string;
 }
 
-type ValueTypes = { size: ExpressionType, type: "int8" | "int16" | "int32" | "int64" | "uint8" | "uint16" | "uint32" | "uint64" | "float" | "double" | "char" }
-
+type ValueTypes = { dimentions: number[], type: "int8" | "int16" | "int32" | "int64" | "uint8" | "uint16" | "uint32" | "uint64" | "float" | "double" | "char" }
 
 type VariableDeclarationType = {
     type: ValueTypes;
@@ -79,10 +91,7 @@ type MathExpressionType = {
     right: ExpressionType;
 }
 
-type ReturnType = {
-    expression: SystemCallType | FunctionCallType | MathExpressionType | string | number
-}
-
+type ReturnType = ExpressionType 
 
 type SingleExpressionType = (
     {
@@ -96,7 +105,10 @@ type SingleExpressionType = (
         "functionCall" |
         "functionDeclaration" |
         "mathExpression" |
-        "return";
+        "return" |
+        "number" |
+        "string" |
+        "variable";
         expression:
         VariableDeclarationType |
         ModifyVariableType |
@@ -107,12 +119,13 @@ type SingleExpressionType = (
         FunctionCallType |
         FunctionDeclarationType |
         MathExpressionType |
-        ReturnType
-
+        ReturnType |
+        number |
+        string
     }
 )
 
-type ExpressionType = SingleExpressionType[];
+type ExpressionType = SingleExpressionType[] | SingleExpressionType;
 
 var wordsPossibleChars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_";
 
@@ -122,7 +135,7 @@ function findStatementInsideDelimiters(str: TokenType[], startDelimiter: string,
     let result = [str[0] ?? { type: "unknown", value: "" }];
     let length = 1
     while (numberOfOpeningDelimiters != numberOfClosingDelimiters) {
-        if(str[length] == undefined) return result;
+        if (str[length] == undefined) return result;
         // @ts-ignore
         if (str[length].value === startDelimiter) {
             numberOfOpeningDelimiters++;
@@ -173,7 +186,7 @@ function handleFile(fileContent: string) {
 
     var currentToken = "";
     var insideQuotes = false;
-    var tokens: TokenType[] = [];
+    var tokens: TokenType[] = [{ type: "curlyBrace", value: "{" }];
 
     var i = 0
     while (i < outputLines.length) {
@@ -278,12 +291,35 @@ function handleFile(fileContent: string) {
         i++
     }
 
-    i = 0;
-    while (i < tokens.length) {
-        let token = tokens[i];
+    tokens.push({ type: "curlyBrace", value: "}" });
 
-    }
+    /*
+    let fetchedExpression = fetchExpression(tokens);
+    console.log(fetchedExpression);
+    */
 
     // output the file to main.out
     Bun.write("main.out", JSON.stringify(tokens, null, 2))
+}
+
+function fetchExpression(tokens: TokenType[]): ExpressionType {
+    if (tokens[0]?.value != "{") {
+        //TODO: handle the case where a variable could be named after a number
+        // if it doesn't start with one of the reserved keywords, we return a single expression with type return and the expression of type return has a type of whatever the data returned is;
+    }
+}
+
+console.log(fetchReturn([{type: "word", value: "123"}]))
+function fetchReturn(tokens: TokenType[]): ReturnType {
+    if (tokens[0]?.type == "string") {
+        // use eval to remove the quotes and the backslashes for formatting purposes
+        return { expression: eval(tokens[0].value), type: "string" };
+    } else if(checkIfNumber(tokens[0]?.value ?? "a")) {
+        return { expression: Number(tokens[0]?.value), type: "number" };
+    } 
+    return fetchExpression(tokens);
+}
+
+function checkIfNumber(str: string): boolean {
+    return !isNaN(Number(str));
 }

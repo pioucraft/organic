@@ -1,5 +1,9 @@
 [
   {
+    "type": "curlyBrace",
+    "value": "{"
+  },
+  {
     "type": "word",
     "value": "var"
   },
@@ -340,6 +344,38 @@
     "value": "}"
   },
   {
+    "type": "word",
+    "value": "call"
+  },
+  {
+    "type": "word",
+    "value": "add"
+  },
+  {
+    "type": "parenthesis",
+    "value": "("
+  },
+  {
+    "type": "word",
+    "value": "i"
+  },
+  {
+    "type": "comma",
+    "value": ","
+  },
+  {
+    "type": "word",
+    "value": "2"
+  },
+  {
+    "type": "parenthesis",
+    "value": ")"
+  },
+  {
+    "type": "semicolon",
+    "value": ";"
+  },
+  {
     "type": "bracket",
     "value": "}"
   },
@@ -566,5 +602,9 @@
   {
     "type": "semicolon",
     "value": ";"
+  },
+  {
+    "type": "curlyBrace",
+    "value": "}"
   }
 ]

@@ -30,6 +30,8 @@ while i < 10 do {
     if i == 8 do {
         break; // Exit the loop when i is 8
     }
+
+    call add(i, 2); // Call the add function with i and 2
 }
 
 // Make a syscall to print hello world. Use raw linux syscalls
