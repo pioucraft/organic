@@ -79,6 +79,10 @@ example: "// This is a single-line comment"
 example: "/* This is a
 multi-line comment */"
 
+## Syscalls:
+### Use the syscall keyword followed by the syscall number and the arguments in parentheses.
+example: "syscall 1(5, 10)" // This would call syscall number 1 with arguments 5 and 10.
+
 ## TODO : Implement the following features:
 1. Support for lists.
 2. Support for dictionaries.
