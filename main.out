@@ -2,13 +2,16 @@
   "type": "variableDeclaration",
   "expression": {
     "type": {
-      "dimensions": [],
+      "size": {
+        "type": "number",
+        "expression": 1
+      },
       "baseType": "int32"
     },
     "name": "a",
     "expression": {
       "type": "number",
-      "expression": 64
+      "expression": 5
     }
   }
 }

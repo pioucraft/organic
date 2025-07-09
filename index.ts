@@ -14,12 +14,11 @@ const ReservedKeywords = [
     "function",
     "return",
     "free",
-    "do",
     "alloc",
     "break",
     "continue",
     "get",
-    "set"
+    "set",
 ];
 
 type TokenType = {
@@ -83,6 +82,7 @@ type VariableDeclarationType = {
 
 type ModifyVariableType = {
     variable: VariableDeclarationType;
+    position: ExpressionType | null;
     newExpression: ExpressionType;
 };
 
@@ -174,7 +174,7 @@ type SingleExpressionType = {
         | "modifyPointerValue"
         | "getPointerValue"
         | "break"
-        | "continue";   
+        | "continue";
     expression:
         | VariableDeclarationType
         | ModifyVariableType
@@ -192,7 +192,7 @@ type SingleExpressionType = {
         | FreeMemoryType
         | AllocationForPointerType
         | ModifyPointerValueType
-        | GetPointerValueType 
+        | GetPointerValueType
         | BreakType
         | ContinueType;
 };
@@ -392,10 +392,12 @@ function fetchVariableDeclaration(
 
     let tokensToLoop = tokens.slice(2);
 
-    let size: ExpressionType = [];
-    let token = findStatementInsideDelimiters(tokensToLoop, "[", "]");
-    tokensToLoop = tokensToLoop.slice(token.length);
-    size = fetchExpression(token.slice(1, -1));
+    let size: ExpressionType =
+        tokensToLoop[0]?.value == "["
+            ? fetchExpression(
+                  findStatementInsideDelimiters(tokensToLoop, "[", "]"),
+              )
+            : { type: "number", expression: 1 };
 
     if (checkIfIsNumber(tokensToLoop[0]?.value))
         throw new Error("Variable name cannot be a number");
