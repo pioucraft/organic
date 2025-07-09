@@ -44,3 +44,10 @@ var int32 var1 = 3 * 3 + 4 - 5 ** 2 / 2 % 4
 func add(a int32, b int32): int32 {
     return a + b; // Return the sum of a and b
 };
+
+// pointers :
+var pointer ptr = alloc int32;
+// Assign a value to the pointer
+modp ptr = 42;
+// free the pointer
+free ptr;

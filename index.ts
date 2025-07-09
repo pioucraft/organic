@@ -20,7 +20,20 @@ type TokenType = {
     value: string;
 }
 
-type ValueTypes = { dimentions: number[], type: "int8" | "int16" | "int32" | "int64" | "uint8" | "uint16" | "uint32" | "uint64" | "float" | "double" | "char" }
+type ValueTypes = { dimentions: number[], type: "int8" | "int16" | "int32" | "int64" | "uint8" | "uint16" | "uint32" | "uint64" | "float" | "double" | "char" | "pointer" }
+
+type AllocationForPointerType = {
+    type: ValueTypes;
+}
+
+type FreeMemoryType = {
+    address: ExpressionType;
+}
+
+type ModifyPointerValueType = {
+    address: ExpressionType;
+    newValue: ExpressionType;
+}
 
 type VariableDeclarationType = {
     type: ValueTypes;
@@ -108,7 +121,10 @@ type SingleExpressionType = (
         "return" |
         "number" |
         "string" |
-        "variable";
+        "variable" |
+        "freeMemory" |
+        "allocationForPointer" |
+        "modifyPointerValue";
         expression:
         VariableDeclarationType |
         ModifyVariableType |
@@ -121,7 +137,10 @@ type SingleExpressionType = (
         MathExpressionType |
         ReturnType |
         number |
-        string
+        string |
+        FreeMemoryType |
+        AllocationForPointerType |
+        ModifyPointerValueType;
     }
 )
 
