@@ -13,8 +13,13 @@ const ReservedKeywords = [
     "syscall",
     "function",
     "return",
-    "modP",
     "free",
+    "do",
+    "alloc",
+    "break",
+    "continue",
+    "get",
+    "set"
 ];
 
 type TokenType = {
@@ -23,7 +28,7 @@ type TokenType = {
 };
 
 type ValueTypes = {
-    dimensions: ExpressionType[];
+    size: ExpressionType;
     baseType:
         | "int8"
         | "int16"
@@ -51,10 +56,14 @@ var validBaseTypes = [
     "double",
     "char",
     "pointer",
-]
+];
 
 type AllocationForPointerType = {
     type: ValueTypes;
+};
+
+type GetPointerValueType = {
+    address: ExpressionType;
 };
 
 type FreeMemoryType = {
@@ -106,6 +115,9 @@ type WhileType = {
     condition: ExpressionType;
     body: ExpressionType;
 };
+
+type BreakType = null;
+type ContinueType = null;
 
 type SystemCallType = {
     functionName: string;
@@ -159,7 +171,10 @@ type SingleExpressionType = {
         | "variable"
         | "freeMemory"
         | "allocationForPointer"
-        | "modifyPointerValue";
+        | "modifyPointerValue"
+        | "getPointerValue"
+        | "break"
+        | "continue";   
     expression:
         | VariableDeclarationType
         | ModifyVariableType
@@ -176,7 +191,10 @@ type SingleExpressionType = {
         | VariableType
         | FreeMemoryType
         | AllocationForPointerType
-        | ModifyPointerValueType;
+        | ModifyPointerValueType
+        | GetPointerValueType 
+        | BreakType
+        | ContinueType;
 };
 
 type ExpressionType = SingleExpressionType[] | SingleExpressionType;
@@ -292,7 +310,7 @@ function handleFile(fileContent: string) {
         } else if (char == ":") {
             tokens.push({ type: "colon", value: char });
         } else if (char == "=") {
-            tokens.push({type: "equal", value: char});
+            tokens.push({ type: "equal", value: char });
         } else if (
             char == "+" ||
             char == "-" ||
@@ -336,8 +354,9 @@ function handleFile(fileContent: string) {
 
     tokens.push({ type: "curlyBrace", value: "}" });
 
-
-    let fetchedExpression: ExpressionType = fetchExpression(tokens.slice(1, -1));
+    let fetchedExpression: ExpressionType = fetchExpression(
+        tokens.slice(1, -1),
+    );
     // output the file to main.out
     Bun.write("main.out", JSON.stringify(fetchedExpression, null, 2));
 }
@@ -370,19 +389,16 @@ function fetchVariableDeclaration(
             `Invalid base type: ${tokens[1]?.value}. Valid types are: ${validBaseTypes.join(", ")}`,
         );
     }
-    let tokensToLoop = tokens.slice(2)
-    let dimensions: ExpressionType[] = [];
-    while(tokensToLoop[0]?.value == "[") {
-        let token = findStatementInsideDelimiters(
-            tokensToLoop,
-            "[",
-            "]",
-        );
-        dimensions.push(fetchExpression(token.slice(1, -1)));
-        tokensToLoop = tokensToLoop.slice(token.length);
-    }
 
-    if(checkIfIsNumber(tokensToLoop[0]?.value)) throw new Error("Variable name cannot be a number");
+    let tokensToLoop = tokens.slice(2);
+
+    let size: ExpressionType = [];
+    let token = findStatementInsideDelimiters(tokensToLoop, "[", "]");
+    tokensToLoop = tokensToLoop.slice(token.length);
+    size = fetchExpression(token.slice(1, -1));
+
+    if (checkIfIsNumber(tokensToLoop[0]?.value))
+        throw new Error("Variable name cannot be a number");
     if (ReservedKeywords.includes(tokensToLoop[0]?.value as string)) {
         throw new Error(
             `Variable name cannot be a reserved keyword: ${tokensToLoop[0]?.value}`,
@@ -395,12 +411,12 @@ function fetchVariableDeclaration(
     expression = fetchExpression(tokensToLoop);
     return {
         type: {
-            dimensions: dimensions,
+            size: size,
             baseType: tokens[1]?.value as ValueTypes["baseType"],
         },
         name: variableName,
         expression: expression,
-    }
+    };
 }
 
 function checkIfIsNumber(str: string | undefined): boolean {
