@@ -13,6 +13,8 @@ const ReservedKeywords = [
     "syscall",
     "function",
     "return",
+    "modP",
+    "free"
 ]
 
 type TokenType = {
@@ -106,6 +108,11 @@ type MathExpressionType = {
 
 type ReturnType = ExpressionType 
 
+type VariableType = {
+    name: string;
+    location: number[];
+}
+
 type SingleExpressionType = (
     {
         type:
@@ -138,6 +145,7 @@ type SingleExpressionType = (
         ReturnType |
         number |
         string |
+        VariableType |
         FreeMemoryType |
         AllocationForPointerType |
         ModifyPointerValueType;
