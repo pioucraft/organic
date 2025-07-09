@@ -151,7 +151,7 @@ type ReturnType = ExpressionType;
 
 type VariableType = {
     name: string;
-    location: ExpressionType[];
+    location: ExpressionType;
 };
 
 type SingleExpressionType = {
